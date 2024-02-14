@@ -1,0 +1,456 @@
+{
+  "version": "0.1.0",
+  "name": "onnyx_advertise",
+  "instructions": [
+    {
+      "name": "createFaucet",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "faucet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "addTree",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "faucet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "treeConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "bubblegumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createCampaign",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "campaign",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CreateCampaignParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateCampaign",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "campaign",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "UpdateCampaignParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "crankCampaign",
+      "accounts": [
+        {
+          "name": "onnyx",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userDkp",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "faucet",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "campaign",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "publisher",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treeConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "merkleTree",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "leafOwner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "logWrapper",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "compressionProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "bubblegumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "CrankCampaignParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "endCampaign",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "campaign",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Campaign",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "conversions",
+            "type": {
+              "vec": {
+                "defined": "Conversion"
+              }
+            }
+          },
+          {
+            "name": "audiances",
+            "type": {
+              "vec": {
+                "defined": "Audiance"
+              }
+            }
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Faucet",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "merkleTree",
+            "type": "publicKey"
+          },
+          {
+            "name": "currentSupply",
+            "type": "u64"
+          },
+          {
+            "name": "supplyCap",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "CrankCampaignParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "conversion",
+            "type": {
+              "defined": "Conversion"
+            }
+          },
+          {
+            "name": "audiance",
+            "type": {
+              "defined": "Audiance"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateCampaignParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "conversions",
+            "type": {
+              "vec": {
+                "defined": "Conversion"
+              }
+            }
+          },
+          {
+            "name": "audiances",
+            "type": {
+              "vec": {
+                "defined": "Audiance"
+              }
+            }
+          },
+          {
+            "name": "name",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateCampaignParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "conversions",
+            "type": {
+              "vec": {
+                "defined": "Conversion"
+              }
+            }
+          },
+          {
+            "name": "audiances",
+            "type": {
+              "vec": {
+                "defined": "Audiance"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Conversion",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Impression",
+            "fields": [
+              "u64",
+              "u64"
+            ]
+          },
+          {
+            "name": "Click",
+            "fields": [
+              "u64",
+              "u64"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Audiance",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NftDegen0"
+          },
+          {
+            "name": "NftDegen1"
+          },
+          {
+            "name": "NftDegen2"
+          },
+          {
+            "name": "Trader0"
+          },
+          {
+            "name": "Trader1"
+          },
+          {
+            "name": "Trader2"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidAuth",
+      "msg": "invalid authority"
+    },
+    {
+      "code": 6001,
+      "name": "NameTooLong",
+      "msg": "name too long"
+    },
+    {
+      "code": 6002,
+      "name": "TooManyAudiances",
+      "msg": "too many audiances"
+    },
+    {
+      "code": 6003,
+      "name": "TooManyConversions",
+      "msg": "too many conversions"
+    },
+    {
+      "code": 6004,
+      "name": "NothingToConvert",
+      "msg": "nothing to convert"
+    },
+    {
+      "code": 6005,
+      "name": "InvalidTree",
+      "msg": "invalid merkle tree"
+    },
+    {
+      "code": 6006,
+      "name": "CampaignNotOver",
+      "msg": "campaign not over"
+    },
+    {
+      "code": 6007,
+      "name": "InvalidAudiance",
+      "msg": "invalid audiance"
+    }
+  ],
+  "metadata": {
+    "address": "GJ6EXCbn3BNRwvRAATBXwJKU3cCv8ScQC7FyxF82vShP"
+  }
+}

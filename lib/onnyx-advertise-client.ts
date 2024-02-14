@@ -126,6 +126,10 @@ export const updateCampaignIx = async (program, signerPubkey, campaignPda, conve
     }).instruction()
 }
 
+export const fetchCampaign = async (program, campaignPda) => {
+    return await program.account.campaign.fetch(campaignPda);
+}
+
 export const crankCampaignIx = async (program, signerPubkey, userDpk, faucetPda, campaignPda, publisherPubkey, audiance, conversion) => {
     const faucetAccount = await program.account.faucet.fetch(faucetPda);
     const umi = createUmi(process.env.RPC);

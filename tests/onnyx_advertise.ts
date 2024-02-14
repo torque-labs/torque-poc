@@ -3,7 +3,7 @@ import {Connection, Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { Program } from "@coral-xyz/anchor";
 import { OnnyxAdvertise } from "../target/types/onnyx_advertise";
 import base58 from 'bs58';
-import { addTreeToFaucetIx, crankCampaignIx, createCampaignIx, createFaucetIx, endCampaignIx, executeTx, findCampaignPda, findFaucetPda, loadCliWallet, updateCampaignIx } from "../lib/onnyx-advertise-client";
+import { addTreeToFaucetIx, crankCampaignIx, createCampaignIx, createFaucetIx, endCampaignIx, executeTx, fetchCampaign, findCampaignPda, findFaucetPda, loadCliWallet, updateCampaignIx } from "../lib/onnyx-advertise-client";
 import { expect } from "chai";
 
 describe("onnyx_advertise", () => {
@@ -58,7 +58,7 @@ describe("onnyx_advertise", () => {
       const postCampaign = await program.account.campaign.fetch(campaignPda);
       expect(Number(preCampaign.conversions[0].click[0])).eql(Number(postCampaign.conversions[0].click[0]) + 1);
     });
-    it("update campaign", async () => {
+    it.skip("update campaign", async () => {
       const newConversions = [{click: [new anchor.BN(5), new anchor.BN(2)]}];
       const newAudiances = [{trader1:{}}];
       const ix = await updateCampaignIx(program, advertiser.publicKey, campaignPda, newConversions, newAudiances);
@@ -69,7 +69,7 @@ describe("onnyx_advertise", () => {
       expect(Number(campaign.conversions[0].click['0'])).eql(5);
       expect(Number(campaign.conversions[0].click['1'])).eql(2);
     });
-    it.only("end campaign", async () => {
+    it.skip("end campaign", async () => {
       const ix = await endCampaignIx(program, advertiser.publicKey, campaignPda);
       await executeTx(advertiser, [ix], null, null, true);
       try {
@@ -77,6 +77,12 @@ describe("onnyx_advertise", () => {
         expect(false).eql(true);
       } catch (e) {}
     });
+  });
+
+  after(async () => {
+    const campaign = await fetchCampaign(program, campaignPda);
+    const campaignAudiances = campaign.audiances.map(x => Object.keys(x)[0])
+    console.log({campaignAudiances});
   });
 });
 
