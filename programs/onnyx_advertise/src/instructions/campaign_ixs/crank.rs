@@ -4,7 +4,7 @@ use crate::*;
 
 pub fn crank(ctx: Context<CrankCampaign>, params: CrankCampaignParams) -> Result<()> {
     // update campaign data
-    let price = Campaign::log_conversion(&mut ctx.accounts.campaign, params.conversion, params.audiance).unwrap();
+    let price = Campaign::log_completed_offer(&mut ctx.accounts.campaign, params.offer, params.audiance).unwrap();
 
     // pay out publisher
     **ctx.accounts.campaign.to_account_info().try_borrow_mut_lamports()? -= price;
@@ -62,7 +62,7 @@ pub fn crank(ctx: Context<CrankCampaign>, params: CrankCampaignParams) -> Result
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct CrankCampaignParams {
-    conversion: Conversion,
+    offer: Offer,
     audiance: Audiance
 }
 

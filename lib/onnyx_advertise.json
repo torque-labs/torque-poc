@@ -426,7 +426,7 @@
     },
     {
       "code": 6003,
-      "name": "TooManyConversions",
+      "name": "TooManyOffers",
       "msg": "too many conversions"
     },
     {

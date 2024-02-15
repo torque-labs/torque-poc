@@ -102,10 +102,10 @@ export const addTreeToFaucetIx = async (program, signerPubkey) => {
 /**
  * CAMPAIGN IXs
  */
-export const createCampaignIx = async (program, signerPubkey, name, conversions, audiances) => {
+export const createCampaignIx = async (program, signerPubkey, name, offers, audiances) => {
     const campaignPda = findCampaignPda(program, signerPubkey, name);
     return await program.methods.createCampaign({
-        conversions,
+        offers,
         audiances, 
         name
     }).accounts({
@@ -115,9 +115,9 @@ export const createCampaignIx = async (program, signerPubkey, name, conversions,
     }).instruction()
 }
 
-export const updateCampaignIx = async (program, signerPubkey, campaignPda, conversions, audiances) => {
+export const updateCampaignIx = async (program, signerPubkey, campaignPda, offers, audiances) => {
     return await program.methods.updateCampaign({
-        conversions,
+        offers,
         audiances, 
     }).accounts({
         authority: signerPubkey,
@@ -130,13 +130,13 @@ export const fetchCampaign = async (program, campaignPda) => {
     return await program.account.campaign.fetch(campaignPda);
 }
 
-export const crankCampaignIx = async (program, signerPubkey, userDpk, faucetPda, campaignPda, publisherPubkey, audiance, conversion) => {
+export const crankCampaignIx = async (program, signerPubkey, userDpk, faucetPda, campaignPda, publisherPubkey, audiance, offer) => {
     const faucetAccount = await program.account.faucet.fetch(faucetPda);
     const umi = createUmi(process.env.RPC);
     const [treeConfig] = findTreeConfigPda(umi,{merkleTree: faucetAccount.merkleTree});
     return await program.methods.crankCampaign({
         audiance, 
-        conversion
+        offer
     }).accounts({
         onnyx: signerPubkey, 
         userDkp: userDpk,

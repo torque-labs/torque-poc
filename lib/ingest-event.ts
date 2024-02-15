@@ -33,7 +33,7 @@ export default async function ingestEvent(eventType, publisherId, userPublicKey,
     const publisherPubkey = new PublicKey(publisherId);
     // send transaction
     try {
-        const faucetPda = new PublicKey('TODO');
+        const faucetPda = new PublicKey('CgNpsgGpvVR4snzt1tVmdN3SsDjUVAjjGvt5jzkYtmfp');
         const ix = await crankCampaignIx(
             program, 
             onnyxKeyPair, 

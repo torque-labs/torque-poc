@@ -3,7 +3,7 @@ use anchor_lang::solana_program::{program::invoke, system_instruction::transfer}
 use crate::*;
 
 pub fn create(ctx: Context<CreateCampaign>, params: CreateCampaignParams) -> Result<()> {
-    let campaign_cost = Campaign::calc_campaign_cost(params.conversions.clone());
+    let campaign_cost = Campaign::calc_value_of_offers(params.offers.clone());
     invoke(
         &transfer(
             &ctx.accounts.authority.key(), 
@@ -20,7 +20,7 @@ pub fn create(ctx: Context<CreateCampaign>, params: CreateCampaignParams) -> Res
     *ctx.accounts.campaign = Campaign::new(
         ctx.accounts.authority.key(), 
         params.name, 
-        params.conversions.clone(),
+        params.offers.clone(),
         params.audiances.clone(),
         ctx.bumps.campaign
     ).unwrap();
@@ -33,7 +33,7 @@ pub fn create(ctx: Context<CreateCampaign>, params: CreateCampaignParams) -> Res
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct CreateCampaignParams {
-    conversions: Vec<Conversion>,
+    offers: Vec<Offer>,
     audiances: Vec<Audiance>,
     name: String
 }

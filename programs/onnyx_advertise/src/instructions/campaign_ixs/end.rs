@@ -2,8 +2,11 @@ use crate::*;
 
 pub fn end(ctx: Context<EndCampaign>) -> Result<()> {
     require!(ctx.accounts.authority.key() == ctx.accounts.campaign.authority, OnnyxError::InvalidAuth);
-    // let remaining_conversions: u64 = Campaign::get_remaining_conversions(&mut ctx.accounts.campaign);
-    // require!(remaining_conversions == 0, OnnyxError::CampaignNotOver);
+
+    let value_of_remaining_offers: u64 = Campaign::get_value_of_remaining_offers(&mut ctx.accounts.campaign);
+    **ctx.accounts.campaign.to_account_info().try_borrow_mut_lamports()? -= value_of_remaining_offers;
+    **ctx.accounts.authority.to_account_info().try_borrow_mut_lamports()? += value_of_remaining_offers;
+    
     Ok(())
 }
 

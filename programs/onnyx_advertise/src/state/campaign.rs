@@ -3,7 +3,7 @@ use crate::*;
 #[account]
 pub struct Campaign {
     pub authority: Pubkey,
-    pub conversions: Vec<Conversion>,   // max 2
+    pub offers: Vec<Offer>,             // max 2
     pub audiances: Vec<Audiance>,       // max 6
     pub name: String,
     pub bump: u8
@@ -11,7 +11,7 @@ pub struct Campaign {
 impl Campaign {
     pub const LEN: usize = 8
         + 32
-        + 2 * CONVERSION_SIZE
+        + 2 * OFFER_SIZE
         + 6 * AUDIANCE_SIZE
         + 25 // max of 25 chars in name
         + 1;
@@ -19,24 +19,24 @@ impl Campaign {
     pub fn new(
         authority: Pubkey, 
         name: String, 
-        conversions: Vec<Conversion>,
+        offers: Vec<Offer>,
         audiances: Vec<Audiance>,
         bump: u8
     ) -> Result<Campaign> {
         require!(name.len() <= 25, OnnyxError::NameTooLong);
-        require!(conversions.len() <= 25, OnnyxError::TooManyConversions);
+        require!(offers.len() <= 25, OnnyxError::TooManyOffers);
         require!(audiances.len() <= 25, OnnyxError::TooManyAudiances);
-        Ok(Campaign {authority, name, conversions, audiances, bump})
+        Ok(Campaign {authority, name, offers, audiances, bump})
     }
 
-    // returns the price of the conversion to be sent to publisher
-    pub fn log_conversion(&mut self, conversion: Conversion, audiance: Audiance) -> Result<u64> {
+    // returns the price of the offer to be sent to publisher
+    pub fn log_completed_offer(&mut self, offer: Offer, audiance: Audiance) -> Result<u64> {
         require!(self.audiances.contains(&audiance), OnnyxError::InvalidAudiance);
-        match conversion {
-            Conversion::Click(_remaining, _price) => {
-                for c in self.conversions.iter_mut() {
+        match offer {
+            Offer::Click(_remaining, _price) => {
+                for c in self.offers.iter_mut() {
                     match c {
-                        Conversion::Click(_remaining, _price) => {
+                        Offer::Click(_remaining, _price) => {
                             *_remaining = *_remaining - 1;
                             return Ok(*_price);
                         },
@@ -44,10 +44,10 @@ impl Campaign {
                     }
                 }       
             },
-            Conversion::Impression(_remaining, _price) => {
-                for c in self.conversions.iter_mut() {
+            Offer::Impression(_remaining, _price) => {
+                for c in self.offers.iter_mut() {
                     match c {
-                        Conversion::Impression(_remaining, _price) => {
+                        Offer::Impression(_remaining, _price) => {
                             *_remaining = *_remaining - 1;
                             return Ok(*_price);
                         },
@@ -59,26 +59,24 @@ impl Campaign {
         return Err(OnnyxError::NothingToConvert.into());
     }
 
-    pub fn get_remaining_conversions(&mut self) -> u64 {
-        return self.conversions.iter().fold(0, |acc, conversion| match conversion {
-            Conversion::Impression(first, _) | Conversion::Click(first, _) => acc + first,
-        });
+    pub fn get_value_of_remaining_offers(&mut self) -> u64 {
+        return Campaign::calc_value_of_offers(self.offers.clone());
     }
 
-    pub fn calc_campaign_cost(conversions: Vec<Conversion>) -> u64 {
-        return conversions.iter().fold(0, |acc, conversion| match conversion {
-            Conversion::Impression(_, price) | Conversion::Click(_, price) => acc + price,
+    pub fn calc_value_of_offers(offers: Vec<Offer>) -> u64 {
+        return offers.iter().fold(0, |acc, offer| match offer {
+            Offer::Impression(amount, price) | Offer::Click(amount, price) => acc + (amount * price),
         });
     }
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 // (amount: u64, price: u64)
-pub enum Conversion {
+pub enum Offer {
     Impression(u64, u64),
     Click(u64, u64)
 }
-pub const CONVERSION_SIZE: usize = 1 + 8 * 2;
+pub const OFFER_SIZE: usize = 1 + 8 * 2;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub enum Audiance {

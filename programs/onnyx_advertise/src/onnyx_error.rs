@@ -8,8 +8,8 @@ pub enum OnnyxError {
     NameTooLong,
     #[msg("too many audiances")]
     TooManyAudiances,
-    #[msg("too many conversions")]
-    TooManyConversions,
+    #[msg("too many offers")]
+    TooManyOffers,
     #[msg("nothing to convert")]
     NothingToConvert,
     #[msg("invalid merkle tree")]
