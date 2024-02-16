@@ -4,7 +4,7 @@ use crate::*;
 pub struct Campaign {
     pub authority: Pubkey,
     pub offers: Vec<Offer>,             // max 2
-    pub audiances: Vec<Audiance>,       // max 6
+    pub audiances: Vec<String>,         // max 6
     pub name: String,
     pub bump: u8
 }
@@ -12,25 +12,28 @@ impl Campaign {
     pub const LEN: usize = 8
         + 32
         + 2 * OFFER_SIZE
-        + 6 * AUDIANCE_SIZE
-        + 25 // max of 25 chars in name
+        + 6 * 25        // max of 25 chars in each audiance
+        + 25            // max of 25 chars in name
         + 1;
 
     pub fn new(
         authority: Pubkey, 
         name: String, 
         offers: Vec<Offer>,
-        audiances: Vec<Audiance>,
+        audiances: Vec<String>,
         bump: u8
     ) -> Result<Campaign> {
         require!(name.len() <= 25, OnnyxError::NameTooLong);
         require!(offers.len() <= 25, OnnyxError::TooManyOffers);
-        require!(audiances.len() <= 25, OnnyxError::TooManyAudiances);
+        require!(audiances.len() <= 6, OnnyxError::TooManyAudiances);
+        for aud in audiances.iter() {
+            require!(aud.len() <= 25, OnnyxError::NameTooLong);
+        }
         Ok(Campaign {authority, name, offers, audiances, bump})
     }
 
     // returns the price of the offer to be sent to publisher
-    pub fn log_completed_offer(&mut self, offer: Offer, audiance: Audiance) -> Result<u64> {
+    pub fn log_completed_offer(&mut self, offer: Offer, audiance: String) -> Result<u64> {
         require!(self.audiances.contains(&audiance), OnnyxError::InvalidAudiance);
         match offer {
             Offer::Click(_remaining, _price) => {
@@ -77,14 +80,3 @@ pub enum Offer {
     Click(u64, u64)
 }
 pub const OFFER_SIZE: usize = 1 + 8 * 2;
-
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
-pub enum Audiance {
-    NftDegen0,
-    NftDegen1,
-    NftDegen2,
-    Trader0,
-    Trader1,
-    Trader2,
-}
-pub const AUDIANCE_SIZE: usize = 1;

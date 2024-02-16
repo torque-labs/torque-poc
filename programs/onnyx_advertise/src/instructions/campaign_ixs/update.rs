@@ -43,7 +43,7 @@ pub fn update(ctx: Context<UpdateCampaign>, params: UpdateCampaignParams) -> Res
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct UpdateCampaignParams {
     offers: Vec<Offer>,
-    audiances: Vec<Audiance>,
+    audiances: Vec<String>,
 }
 
 #[derive(Accounts)]

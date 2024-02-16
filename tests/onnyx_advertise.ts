@@ -37,20 +37,20 @@ describe("onnyx_advertise", () => {
   });
 
   const offers = [{click: [new anchor.BN(5), new anchor.BN(1)]}];
-  const audiances = [{nftDegen1:{}}, {nftDegen2:{}}, {trader0:{}}];
+  const audiances = ['aud1', 'aud2', 'aud3'];
   const campaignName = 'test0';
   const campaignPda = findCampaignPda(program, advertiser.publicKey, campaignName);
-  describe.only("CAMPAIGN IXs", () => {
+  describe("CAMPAIGN IXs", () => {
     it("create campaign", async () => {
       const ix = await createCampaignIx(program, advertiser.publicKey, campaignName, offers, audiances);
       await executeTx(advertiser, [ix], null, null, true);
       expect(await program.account.campaign.fetch(campaignPda));
     });
-    it.only("crank campaign", async () => {
+    it("crank campaign", async () => {
       const prePublisher = await connection.getBalance(publisher.publicKey);
       const preCampaign = await program.account.campaign.fetch(campaignPda);
       
-      const ix = await crankCampaignIx(program, onnyx.publicKey, user1.publicKey, faucetPda, campaignPda, publisher.publicKey, {nftDegen1:{}}, {click:[new anchor.BN(0), new anchor.BN(0)]});
+      const ix = await crankCampaignIx(program, onnyx.publicKey, user1.publicKey, faucetPda, campaignPda, publisher.publicKey, 'aud1', {click:[new anchor.BN(0), new anchor.BN(0)]});
       await executeTx(onnyx, [ix], user1, null, true);
 
       const postPublisher = await connection.getBalance(publisher.publicKey);
@@ -58,9 +58,9 @@ describe("onnyx_advertise", () => {
       const postCampaign = await program.account.campaign.fetch(campaignPda);
       expect(Number(preCampaign.offers[0].click[0])).eql(Number(postCampaign.offers[0].click[0]) + 1);
     });
-    it("update campaign", async () => {
+    it.only("update campaign", async () => {
       const newOffers = [{click: [new anchor.BN(5), new anchor.BN(2)]}];
-      const newAudiances = [{trader1:{}}];
+      const newAudiances = ['newAud'];
       const ix = await updateCampaignIx(program, advertiser.publicKey, campaignPda, newOffers, newAudiances);
       await executeTx(advertiser, [ix], null, null, true);
 
@@ -80,10 +80,9 @@ describe("onnyx_advertise", () => {
   });
 
   after(async () => {
-    console.log(await program.account.faucet.all());
+    // console.log(await program.account.faucet.all());
     const campaign = await fetchCampaign(program, campaignPda);
-    const campaignAudiances = campaign.audiances.map(x => Object.keys(x)[0])
-    console.log({campaignAudiances});
+    console.log({campaign});
   });
 });
 

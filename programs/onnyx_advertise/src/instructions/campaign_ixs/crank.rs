@@ -63,7 +63,7 @@ pub fn crank(ctx: Context<CrankCampaign>, params: CrankCampaignParams) -> Result
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct CrankCampaignParams {
     offer: Offer,
-    audiance: Audiance
+    audiance: String
 }
 
 #[derive(Accounts)]

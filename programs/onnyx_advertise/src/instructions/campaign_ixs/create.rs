@@ -34,7 +34,7 @@ pub fn create(ctx: Context<CreateCampaign>, params: CreateCampaignParams) -> Res
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct CreateCampaignParams {
     offers: Vec<Offer>,
-    audiances: Vec<Audiance>,
+    audiances: Vec<String>,
     name: String
 }
 
