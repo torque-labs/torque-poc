@@ -130,13 +130,13 @@ export const fetchCampaign = async (program, campaignPda) => {
     return await program.account.campaign.fetch(campaignPda);
 }
 
-export const crankCampaignIx = async (program, signerPubkey, userDpk, faucetPda, campaignPda, publisherPubkey, audiance, offer) => {
+export const crankCampaignIx = async (program, signerPubkey, userDpk, faucetPda, campaignPda, publisherPubkey, audiance, offerName) => {
     const faucetAccount = await program.account.faucet.fetch(faucetPda);
     const umi = createUmi(process.env.RPC);
     const [treeConfig] = findTreeConfigPda(umi,{merkleTree: faucetAccount.merkleTree});
     return await program.methods.crankCampaign({
         audiance, 
-        offer
+        offerName
     }).accounts({
         onnyx: signerPubkey, 
         userDkp: userDpk,

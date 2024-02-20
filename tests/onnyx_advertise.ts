@@ -36,7 +36,7 @@ describe("onnyx_advertise", () => {
     });
   });
 
-  const offers = [{click: [new anchor.BN(5), new anchor.BN(1)]}];
+  const offers = [{name: 'click', count: new anchor.BN(5), price: new anchor.BN(1)}];
   const audiances = ['aud1', 'aud2', 'aud3'];
   const campaignName = 'test0';
   const campaignPda = findCampaignPda(program, advertiser.publicKey, campaignName);
@@ -50,24 +50,24 @@ describe("onnyx_advertise", () => {
       const prePublisher = await connection.getBalance(publisher.publicKey);
       const preCampaign = await program.account.campaign.fetch(campaignPda);
       
-      const ix = await crankCampaignIx(program, onnyx.publicKey, user1.publicKey, faucetPda, campaignPda, publisher.publicKey, 'aud1', {click:[new anchor.BN(0), new anchor.BN(0)]});
+      const ix = await crankCampaignIx(program, onnyx.publicKey, user1.publicKey, faucetPda, campaignPda, publisher.publicKey, 'aud1', 'click');
       await executeTx(onnyx, [ix], user1, null, true);
 
       const postPublisher = await connection.getBalance(publisher.publicKey);
       expect(postPublisher).eql(prePublisher + 1);
       const postCampaign = await program.account.campaign.fetch(campaignPda);
-      expect(Number(preCampaign.offers[0].click[0])).eql(Number(postCampaign.offers[0].click[0]) + 1);
+      expect(Number(preCampaign.offers[0].count)).eql(Number(postCampaign.offers[0].count) + 1);
     });
     it.only("update campaign", async () => {
-      const newOffers = [{click: [new anchor.BN(5), new anchor.BN(2)]}];
+      const newOffers = [{name: 'click', count: new anchor.BN(100), price: new anchor.BN(2)}];
       const newAudiances = ['newAud'];
       const ix = await updateCampaignIx(program, advertiser.publicKey, campaignPda, newOffers, newAudiances);
       await executeTx(advertiser, [ix], null, null, true);
 
       const campaign = await program.account.campaign.fetch(campaignPda, 'confirmed');
       expect(campaign.audiances).eql(newAudiances);
-      expect(Number(campaign.offers[0].click['0'])).eql(5);
-      expect(Number(campaign.offers[0].click['1'])).eql(2);
+      expect(Number(campaign.offers[0].count)).eql(100);
+      expect(Number(campaign.offers[0].price)).eql(2);
     });
     it("end campaign", async () => {
       const ix = await endCampaignIx(program, advertiser.publicKey, campaignPda);
@@ -85,9 +85,3 @@ describe("onnyx_advertise", () => {
     console.log({campaign});
   });
 });
-
-/**
- * TODO
- * - test that click count decrements
- * - add sol transfers for updating offers parameters on the campaign
- */
