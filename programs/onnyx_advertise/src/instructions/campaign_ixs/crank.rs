@@ -4,7 +4,7 @@ use crate::*;
 
 pub fn crank(ctx: Context<CrankCampaign>, params: CrankCampaignParams) -> Result<()> {
     // update campaign data
-    let price = Campaign::log_completed_offer(&mut ctx.accounts.campaign, params.offer_name, params.audiance).unwrap();
+    let price = Campaign::log_completed_offer(&mut ctx.accounts.campaign, params.offer_name.clone(), params.audiance.clone()).unwrap();
 
     // pay out publisher
     **ctx.accounts.campaign.to_account_info().try_borrow_mut_lamports()? -= price;
@@ -24,20 +24,30 @@ pub fn crank(ctx: Context<CrankCampaign>, params: CrankCampaignParams) -> Result
         .compression_program(&ctx.accounts.compression_program.to_account_info())
         .system_program(&ctx.accounts.system_program.to_account_info())
         .metadata( MetadataArgs {
-                name: format!("User Action {}", ctx.accounts.faucet.current_supply),
+                name: format!("{}_{}", params.audiance, params.offer_name),
                 symbol: "ONNYX".to_string(),
                 uri: "https://onnyx.xyz".to_string(),
                 creators: [
                     Creator {
-                        address: ctx.accounts.faucet.key(),
-                        verified: false,
-                        share: 100
-                    },
-                    Creator {
                         address: ctx.accounts.user_dkp.key(),
                         verified: false,
                         share: 0
-                    }
+                    },
+                    Creator {
+                        address: ctx.accounts.publisher.key(),
+                        verified: false,
+                        share: 0
+                    },
+                    Creator {
+                        address: ctx.accounts.campaign.key(),
+                        verified: false,
+                        share: 0
+                    },
+                    Creator {
+                        address: ctx.accounts.campaign.authority,
+                        verified: false,
+                        share: 100
+                    },
                 ].to_vec(),
                 seller_fee_basis_points: 0,
                 primary_sale_happened: false,

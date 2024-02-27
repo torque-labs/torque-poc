@@ -46,7 +46,7 @@ describe("onnyx_advertise", () => {
       await executeTx(advertiser, [ix], null, null, true);
       expect(await program.account.campaign.fetch(campaignPda));
     });
-    it("crank campaign", async () => {
+    it.only("crank campaign", async () => {
       const prePublisher = await connection.getBalance(publisher.publicKey);
       const preCampaign = await program.account.campaign.fetch(campaignPda);
       
@@ -58,7 +58,7 @@ describe("onnyx_advertise", () => {
       const postCampaign = await program.account.campaign.fetch(campaignPda);
       expect(Number(preCampaign.offers[0].count)).eql(Number(postCampaign.offers[0].count) + 1);
     });
-    it.only("update campaign", async () => {
+    it("update campaign", async () => {
       const newOffers = [{name: 'click', count: new anchor.BN(100), price: new anchor.BN(2)}];
       const newAudiances = ['newAud'];
       const ix = await updateCampaignIx(program, advertiser.publicKey, campaignPda, newOffers, newAudiances);
