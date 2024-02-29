@@ -56,6 +56,14 @@ export const findCampaignPda = (program, authority, name) => {
     ], program.programId);
     return campaignPda;
 }
+export const findUserConversionPda = (program, campaignPda, userDpk, action) => {
+    let [userConversionPda] = PublicKey.findProgramAddressSync([
+        campaignPda.toBuffer(),
+        userDpk.toBuffer(),
+        Buffer.from(action)
+    ], program.programId);
+    return userConversionPda;
+}
 
 /**
  * FAUCET IXs
@@ -134,6 +142,7 @@ export const crankCampaignIx = async (program, signerPubkey, userDpk, faucetPda,
     const faucetAccount = await program.account.faucet.fetch(faucetPda);
     const umi = createUmi(process.env.RPC);
     const [treeConfig] = findTreeConfigPda(umi,{merkleTree: faucetAccount.merkleTree});
+    const userConversion = findUserConversionPda(program, campaignPda, userDpk, offerName);
     return await program.methods.crankCampaign({
         audiance, 
         offerName
@@ -142,6 +151,7 @@ export const crankCampaignIx = async (program, signerPubkey, userDpk, faucetPda,
         userDkp: userDpk,
         faucet: faucetPda,
         campaign: campaignPda,
+        userConversion,
         publisher: publisherPubkey,
         treeConfig,
         merkleTree: faucetAccount.merkleTree,

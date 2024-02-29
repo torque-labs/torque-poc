@@ -28,7 +28,7 @@ impl Campaign {
         for off in offers.iter() {
             require!(off.name.len() <= 25, OnnyxError::NameTooLong);
         }
-        require!(audiances.len() <= 6, OnnyxError::TooManyAudiances);
+        require!(audiances.len() <= 20, OnnyxError::TooManyAudiances);
         for aud in audiances.iter() {
             require!(aud.len() <= 25, OnnyxError::NameTooLong);
         }

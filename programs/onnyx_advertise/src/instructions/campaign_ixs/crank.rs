@@ -3,6 +3,7 @@ use mpl_bubblegum::{instructions::{MintV1CpiBuilder}, types::{Creator, MetadataA
 use crate::*;
 
 pub fn crank(ctx: Context<CrankCampaign>, params: CrankCampaignParams) -> Result<()> {
+    // TODO add requirement for onnyx keypair to be a signer
     // update campaign data
     let price = Campaign::log_completed_offer(&mut ctx.accounts.campaign, params.offer_name.clone(), params.audiance.clone()).unwrap();
 
@@ -77,6 +78,7 @@ pub struct CrankCampaignParams {
 }
 
 #[derive(Accounts)]
+#[instruction(params: CrankCampaignParams)]
 pub struct CrankCampaign<'info> {
     #[account(mut)]
     pub onnyx: Signer<'info>,
@@ -85,6 +87,14 @@ pub struct CrankCampaign<'info> {
     pub faucet: Account<'info, Faucet>,
     #[account(mut)]
     pub campaign: Account<'info, Campaign>,
+    #[account(
+        init,
+        space=UserConversion::LEN,
+        payer = onnyx,
+        seeds=[campaign.key().as_ref(), user_dkp.key().as_ref(), params.offer_name.as_bytes()],
+        bump
+    )]
+    pub user_conversion: Account<'info, UserConversion>,
     /// CHECK: to be paid out to, verification that this is the correct account happens in our backend
     #[account(mut)]
     pub publisher: UncheckedAccount<'info>,
