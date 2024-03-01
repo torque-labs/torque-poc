@@ -13,7 +13,6 @@ To record web3 user actions on-chain using cNFTs and instantly reward publishers
 ## Accounts (State)
 
 - **Campaign**: Outlines targeted audiences, available offers, and the value of each offer.
-- **UserConversion**: A Program Derived Address (PDA) created when a user claims an offer to prevent duplicate claims by the same user.
 - **Faucet**: An account with authority over a merkle tree to enable the minting of cNFTs.
 
 ## Instructions
