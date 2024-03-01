@@ -6,7 +6,6 @@ use crate::*;
 pub fn crank(ctx: Context<CrankCampaign>, params: CrankCampaignParams) -> Result<()> {
 
     // Uniqueness check - init user_conversion PDA as program owned acc
-    let rent = Rent::get()?;
     create_account(
         CpiContext::new_with_signer(
             ctx.accounts.system_program.to_account_info(),
@@ -21,7 +20,7 @@ pub fn crank(ctx: Context<CrankCampaign>, params: CrankCampaignParams) -> Result
                 &[ctx.bumps.user_conversion]
             ]]
         ),
-        rent.minimum_balance(0),
+        Rent::get()?.minimum_balance(0),
         0,
         &ID
     )?;
