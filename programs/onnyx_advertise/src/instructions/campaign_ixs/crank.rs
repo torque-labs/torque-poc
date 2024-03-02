@@ -1,8 +1,30 @@
 use mpl_bubblegum::{instructions::{MintV1CpiBuilder}, types::{Creator, MetadataArgs, TokenProgramVersion, TokenStandard}};
+use anchor_lang::system_program::{create_account, CreateAccount};
 
 use crate::*;
 
 pub fn crank(ctx: Context<CrankCampaign>, params: CrankCampaignParams) -> Result<()> {
+
+    // Uniqueness check - init user_conversion PDA as program owned acc
+    create_account(
+        CpiContext::new_with_signer(
+            ctx.accounts.system_program.to_account_info(),
+            CreateAccount {
+                from: ctx.accounts.onnyx.to_account_info(),
+                to: ctx.accounts.user_conversion.to_account_info()
+            },
+            &[&[
+                ctx.accounts.campaign.key().as_ref(),
+                ctx.accounts.user_dkp.key.as_ref(),
+                params.offer_name.as_bytes(),
+                &[ctx.bumps.user_conversion]
+            ]]
+        ),
+        Rent::get()?.minimum_balance(0),
+        0,
+        &ID
+    )?;
+
     // TODO add requirement for onnyx keypair to be a signer
     // update campaign data
     let price = Campaign::log_completed_offer(&mut ctx.accounts.campaign, params.offer_name.clone(), params.audiance.clone()).unwrap();
@@ -87,14 +109,13 @@ pub struct CrankCampaign<'info> {
     pub faucet: Account<'info, Faucet>,
     #[account(mut)]
     pub campaign: Account<'info, Campaign>,
+    /// Must be a system program account. If not means initialized as this program account = second claim (uniqueness check fail)
     #[account(
-        init,
-        space=UserConversion::LEN,
-        payer = onnyx,
+        mut,
         seeds=[campaign.key().as_ref(), user_dkp.key().as_ref(), params.offer_name.as_bytes()],
         bump
     )]
-    pub user_conversion: Account<'info, UserConversion>,
+    pub user_conversion: SystemAccount<'info>,
     /// CHECK: to be paid out to, verification that this is the correct account happens in our backend
     #[account(mut)]
     pub publisher: UncheckedAccount<'info>,
